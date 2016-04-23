@@ -220,3 +220,8 @@ build-HexEditor-Desktop_Qt_5_0_2_MinGW_32bit-Debug/
 build-HexEditor-Desktop_Qt_5_6_0_MinGW_32bit-Debug/
 build-NES-Desktop_Qt_5_0_2_MinGW_32bit-Debug/
 build-NES-Desktop_Qt_5_6_0_MinGW_32bit-Debug/
+build-NES-Desktop_Qt_5_6_0_MinGW_32bit-Release/
+
+#files
+6500-50A_MCS6500pgmManJan76.pdf
+NESDoc.pdf

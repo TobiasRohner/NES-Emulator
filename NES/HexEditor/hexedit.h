@@ -45,14 +45,14 @@ struct CursorPosition {
 class HexEdit : public QAbstractScrollArea
 {
     Q_OBJECT
-    
+
 public:
     explicit HexEdit(std::vector<uint8_t> *data = NULL, QWidget *parent = 0);
     ~HexEdit();
 
     void setData(std::vector<uint8_t> *data);
     void updateMonitor();
-    
+
 private:
     Ui::HexEdit *ui;
     std::vector<uint8_t> *data;

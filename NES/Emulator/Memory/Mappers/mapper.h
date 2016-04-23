@@ -1,7 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "../cpumemory.h"
-#include "../ppumemory.h"
+#include "../memory.h"
 #include "../../gamecartridge.h"
 #include <mutex>
 
@@ -25,9 +24,12 @@ public:
     int prgBankPointer2 = 0;
     int chrBankPointer = 0;
 
-    CPUMemory memoryCPU = CPUMemory();
-    PPUMemory memoryPPU = PPUMemory();
+    Memory memoryCPU = Memory(64*KB - 8*KB - 2*16*KB);
+    Memory memoryPPU = Memory(16*KB - 0x2000);
 
 private:
     std::mutex lock;
 };
+
+
+GameCartridge LoadROM(std::string path);

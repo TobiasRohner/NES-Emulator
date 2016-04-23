@@ -4,12 +4,14 @@
 #include <string>
 #include "options.h"
 
+void terminateOpcode(std::shared_ptr<COMMUNCATION_BRIDGE> bridge) {
+    while (!bridge.get()->OPCODE_TERMINATED) { bridge.get()->clk.notify_all(); }
+}
 
-
-CPU_6502::CPU_6502(std::shared_ptr<Mapper> mapper, std::shared_ptr<std::condition_variable> clock)
+CPU_6502::CPU_6502(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_BRIDGE> bridge)
 {
-    CPU_6502::clock = clock;
-    CPU_6502::mapper = mapper;
+    this->bridge = bridge;
+    this->mapper = mapper;
 }
 
 
@@ -17,7 +19,7 @@ CPU_6502::~CPU_6502()
 {
 }
 
-void CPU_6502::next()
+void CPU_6502::processOpcode()
 {
     uint8_t opcode = read8(PC);
 #ifdef DEBUG
@@ -32,10 +34,12 @@ void CPU_6502::next()
     (this->*opTable[opcode])();
 }
 
-void CPU_6502::continueExec()
+void CPU_6502::next()
 {
-    next();
+    bridge.get()->OPCODE_TERMINATED = false;
+    processOpcode();
     processInterrupts();
+    bridge.get()->OPCODE_TERMINATED = true;
 }
 
 void CPU_6502::SetIRQ()
@@ -66,6 +70,26 @@ void CPU_6502::SetRESET()
 void CPU_6502::ClearRESET()
 {
     RESET_set = false;
+}
+
+uint16_t CPU_6502::getPC() {
+    return PC;
+}
+
+uint8_t CPU_6502::getSP() {
+    return SP;
+}
+
+uint8_t CPU_6502::getA() {
+    return A;
+}
+
+uint8_t CPU_6502::getX() {
+    return X;
+}
+
+uint8_t CPU_6502::getY() {
+    return Y;
 }
 
 void CPU_6502::processInterrupts()
@@ -132,7 +156,7 @@ inline void CPU_6502::pullProcessorStatus()
 inline void CPU_6502::tick()
 {
     std::unique_lock<std::mutex> lock(mu);
-    clock.get()->wait(lock);
+    bridge.get()->clk.wait(lock);
 }
 
 void CPU_6502::IRQ()

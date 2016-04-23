@@ -16,10 +16,12 @@ QMAKE_CXXFLAGS += -std=c++0x
 SOURCES += main.cpp\
         mainwindow.cpp \
     Emulator/Memory/memory.cpp \
-    Emulator/Memory/cpumemory.cpp \
     Emulator/Memory/Mappers/mapper.cpp \
-    Emulator/Memory/ppumemory.cpp \
-    Emulator/cpu_6502.cpp
+    Emulator/cpu_6502.cpp \
+    Emulator/debugger.cpp \
+    Emulator/clock.cpp \
+    Emulator/Memory/Mappers/mapper_0.cpp \
+    HexEditor/hexedit.cpp
 
 HEADERS  += mainwindow.h \
     Emulator/Memory/memory.h \
@@ -29,6 +31,11 @@ HEADERS  += mainwindow.h \
     Emulator/gamecartridge.h \
     Emulator/Memory/Mappers/mapper_0.h \
     Emulator/Memory/ppumemory.h \
-    Emulator/cpu_6502.h
+    Emulator/cpu_6502.h \
+    Emulator/debugger.h \
+    Emulator/clock.h \
+    HexEditor/hexedit.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    HexEditor/hexedit.ui \
+    Emulator/debugger.ui

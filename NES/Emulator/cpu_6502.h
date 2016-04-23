@@ -1,8 +1,15 @@
-#pragma once
+#ifndef _CPU_6502
+#define _CPU_6502
 #include <stdint.h>
 #include <memory>
 #include <condition_variable>
 #include "Memory/Mappers/mapper.h"
+
+
+struct COMMUNCATION_BRIDGE {
+    std::condition_variable clk;
+    bool OPCODE_TERMINATED = true;
+};
 
 
 struct ProcessorStatus {
@@ -31,14 +38,18 @@ struct ProcessorStatus {
     }
 };
 
+
+void terminateOpcode(std::shared_ptr<COMMUNCATION_BRIDGE> bridge);
+
+
 class CPU_6502
 {
 public:
-    CPU_6502(std::shared_ptr<Mapper> mapper, std::shared_ptr<std::condition_variable> clock);
+    CPU_6502(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_BRIDGE> bridge);
     ~CPU_6502();
 
+    void processOpcode();
     void next();
-    void continueExec();
     void SetIRQ();
     void ClearIRQ();
     void SetNMI();
@@ -46,8 +57,14 @@ public:
     void SetRESET();
     void ClearRESET();
 
+    uint16_t getPC();
+    uint8_t getSP();
+    uint8_t getA();
+    uint8_t getX();
+    uint8_t getY();
+
 private:
-    std::shared_ptr<std::condition_variable> clock;
+    std::shared_ptr<COMMUNCATION_BRIDGE> bridge;
     std::shared_ptr<Mapper> mapper;
     std::mutex mu;
 
@@ -686,3 +703,5 @@ private:
 
 inline uint8_t bit(uint8_t value, int index);
 inline uint16_t bit(uint16_t value, int index);
+
+#endif

@@ -2,6 +2,9 @@
 #include "options.h"
 #include <iostream>
 
+Memory::Memory() {
+}
+
 Memory::Memory(unsigned int size)
 {
 #ifdef DEBUG
@@ -37,4 +40,8 @@ uint8_t Memory::store(uint16_t address, uint8_t value)
     const uint8_t oldValue = data[address];
     data[address] = value;
     return oldValue;
+}
+
+std::vector<uint8_t> *Memory::getData() {
+    return &data;
 }
