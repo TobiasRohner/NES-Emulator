@@ -6,6 +6,12 @@
 
 
 
+Mapper::Mapper() {
+    prgBankPointer1 = 0;
+    prgBankPointer2 = cartridge.properties.prgRomBankCount - 1;
+    chrBankPointer = 0;
+}
+
 Mapper::Mapper(GameCartridge cartridge)
 {
     Mapper::cartridge = cartridge;

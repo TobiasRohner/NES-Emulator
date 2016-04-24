@@ -18,19 +18,21 @@ class Debugger : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_BRIDGE> bridge, CPU_6502 *cpu, QWidget *parent = 0);
+    explicit Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu, QWidget *parent = 0);
     ~Debugger();
+
+    void updateAllRegisterDisplays();
 
 private:
     Ui::Debugger *ui;
 
-    std::shared_ptr<COMMUNCATION_BRIDGE> bridge;
     std::shared_ptr<Mapper> mapper;
-    CPU_6502 *cpu;
+    std::shared_ptr<CPU_6502> cpu;
 
     HexEdit hexeditCPU;
     HexEdit hexeditPPU;
 
+    void setupUI();
     void connectActions();
 
     void updateDisplayPC();
@@ -38,7 +40,6 @@ private:
     void updateDisplayA();
     void updateDisplayX();
     void updateDisplayY();
-    void updateAllRegisterDisplays();
 
 private slots:
     void pause();

@@ -4,19 +4,19 @@
 #include "../options.h"
 
 
-Debugger::Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_BRIDGE> bridge, CPU_6502 *cpu, QWidget *parent) :
+Debugger::Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Debugger)
 {
     ui->setupUi(this);
+    setupUI();
     connectActions();
 
     this->mapper = mapper;
-    this->bridge = bridge;
     this->cpu = cpu;
 
-    hexeditCPU.setData(mapper->memoryCPU.getData());
-    hexeditPPU.setData(mapper->memoryPPU.getData());
+    hexeditCPU.setMapper(mapper);
+    hexeditPPU.setMapper(mapper);
     ui->layoutCPU->addWidget(&hexeditCPU);
     ui->layoutPPU->addWidget(&hexeditPPU);
 
@@ -28,6 +28,19 @@ Debugger::Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_
 Debugger::~Debugger()
 {
     delete ui;
+}
+
+void Debugger::setupUI() {
+    ui->displayPC->setPrefix("0x");
+    ui->displayPC->setDisplayIntegerBase(16);
+    ui->displaySP->setPrefix("0x");
+    ui->displaySP->setDisplayIntegerBase(16);
+    ui->displayA->setPrefix("0x");
+    ui->displayA->setDisplayIntegerBase(16);
+    ui->displayX->setPrefix("0x");
+    ui->displayX->setDisplayIntegerBase(16);
+    ui->displayY->setPrefix("0x");
+    ui->displayY->setDisplayIntegerBase(16);
 }
 
 void Debugger::connectActions() {
@@ -46,7 +59,7 @@ void Debugger::next() {
 #ifdef DEBUG
     std::cout << "next" << std::endl;
 #endif
-    terminateOpcode(bridge);
+    terminateOpcode(cpu->getBridge());
     hexeditCPU.updateMonitor();
     updateAllRegisterDisplays();
 }

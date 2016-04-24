@@ -19,6 +19,12 @@ CPU_6502::~CPU_6502()
 {
 }
 
+void CPU_6502::initialize() {
+    uint16_t lowByte = read8(0xFFFC);
+    uint16_t highByte = read8(0xFFFD);
+    PC = (highByte << 8) | lowByte;
+}
+
 void CPU_6502::processOpcode()
 {
     uint8_t opcode = read8(PC);
@@ -90,6 +96,10 @@ uint8_t CPU_6502::getX() {
 
 uint8_t CPU_6502::getY() {
     return Y;
+}
+
+std::shared_ptr<COMMUNCATION_BRIDGE> CPU_6502::getBridge() {
+    return bridge;
 }
 
 void CPU_6502::processInterrupts()

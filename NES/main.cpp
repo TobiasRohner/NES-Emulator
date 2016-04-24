@@ -19,10 +19,11 @@ std::vector<uint8_t> openBytes(const char* path) {
                               std::istreambuf_iterator<char>());
 }
 
-void runCPU(CPU_6502 &cpu, bool &brk) {
+void runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk) {
+    cpu.get()->initialize();
     for (;;) {
         if (brk) { break; }
-        cpu.next();
+        cpu.get()->next();
     }
 }
 
@@ -31,17 +32,18 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    GameCartridge cart = LoadROM("E:/Programmieren/C++/NES_v2/test.nes");
+    GameCartridge cart = LoadROM("E:/Programmieren/C++/NES_v2/test2.nes");
     std::shared_ptr<Mapper> mapper(new Mapper(cart));
     std::shared_ptr<COMMUNCATION_BRIDGE> bridge(new COMMUNCATION_BRIDGE);
 
-    CPU_6502 cpu(mapper, bridge);
+    std::shared_ptr<CPU_6502> cpu(new CPU_6502(mapper, bridge));
 
-    Debugger d(mapper, bridge, &cpu);
+    Debugger d(mapper, cpu);
     d.show();
 
     bool brk = false;
-    std::thread threadCPU(runCPU, std::reference_wrapper<CPU_6502>(cpu), std::reference_wrapper<bool>(brk));
+    std::thread threadCPU(runCPU, cpu, std::reference_wrapper<bool>(brk));
+    d.updateAllRegisterDisplays();
 
     int returnValue = a.exec();
 

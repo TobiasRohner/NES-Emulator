@@ -8,6 +8,8 @@
 #include <QFont>
 #include <QFontDatabase>
 #include <QPainter>
+#include <memory>
+#include "../Emulator/Memory/Mappers/mapper.h"
 
 #define BYTES_PER_LINE 16               /*The number of Bytes displayed on a single line*/
 #define ADDRESS_DIGITS 8                /*Number of characters used to represent an address*/
@@ -47,15 +49,15 @@ class HexEdit : public QAbstractScrollArea
     Q_OBJECT
 
 public:
-    explicit HexEdit(std::vector<uint8_t> *data = NULL, QWidget *parent = 0);
+    explicit HexEdit(std::shared_ptr<Mapper> mapper = std::shared_ptr<Mapper>(new Mapper()), QWidget *parent = 0);
     ~HexEdit();
 
-    void setData(std::vector<uint8_t> *data);
+    void setMapper(std::shared_ptr<Mapper> mapper);
     void updateMonitor();
 
 private:
     Ui::HexEdit *ui;
-    std::vector<uint8_t> *data;
+    std::shared_ptr<Mapper> data;
     QFont monospaceFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
 
     bool ASCII_SHOWN = true;               //If the ASCII version of the File will be shown

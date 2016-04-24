@@ -9,11 +9,11 @@
 #include <QColor>
 
 
-HexEdit::HexEdit(std::vector<uint8_t> *data, QWidget *parent) : QAbstractScrollArea(parent),ui(new Ui::HexEdit)
+HexEdit::HexEdit(std::shared_ptr<Mapper> mapper, QWidget *parent) : QAbstractScrollArea(parent),ui(new Ui::HexEdit)
 {
     ui->setupUi(this);
 
-    this->data = data;
+    this->data = mapper;
 
     QPainter painter(viewport());
     painter.setFont(monospaceFont);
@@ -29,8 +29,8 @@ HexEdit::~HexEdit()
     delete ui;
 }
 
-void HexEdit::setData(std::vector<uint8_t> *data) {
-    this->data = data;
+void HexEdit::setMapper(std::shared_ptr<Mapper> mapper) {
+    this->data = mapper;
 }
 
 void HexEdit::updateMonitor() {
@@ -63,13 +63,13 @@ CursorPosition HexEdit::indexClicked(int x, int y, bool ignoreBorders) {
     int line = 0;
     if (area == AREA::BYTES) {
         chr = std::max(0, std::min((int)(xBytes*3*BYTES_PER_LINE), (int)(3*BYTES_PER_LINE)));
-        line = std::max(0, std::min((int)(verticalScrollBar()->value()+(yData*linesShown)), (int)(data->size()/BYTES_PER_LINE)+1))-1;
+        line = std::max(0, std::min((int)(verticalScrollBar()->value()+(yData*linesShown)), (int)(64*KB/BYTES_PER_LINE)+1))-1;
         byte = line*BYTES_PER_LINE + chr/3;
         nibble = std::min(chr%3, 1);
     }
     if (area == AREA::ASCII) {
         chr = std::max(0, std::min((int)(xAscii*BYTES_PER_LINE), (int)(BYTES_PER_LINE)));
-        line = std::max(0, std::min((int)(verticalScrollBar()->value()+(yData*linesShown)), (int)((data->size())/BYTES_PER_LINE)+1))-1;
+        line = std::max(0, std::min((int)(verticalScrollBar()->value()+(yData*linesShown)), (int)(64*KB/BYTES_PER_LINE)+1))-1;
         byte = line*BYTES_PER_LINE + chr;
         nibble = 0;
     }
@@ -109,7 +109,7 @@ void HexEdit::adjustViewport() {
 }
 
 void HexEdit::adjustScrollBars() {
-    int lines = data->size()/BYTES_PER_LINE;
+    int lines = 64*KB/BYTES_PER_LINE;
     verticalScrollBar()->setRange(0, lines);
     verticalScrollBar()->setSingleStep(1);
     verticalScrollBar()->setPageStep(linesShown);
@@ -131,10 +131,10 @@ CursorPosition HexEdit::setCursorPosition(int x, int y, bool ignoreBorders) {
 
 void HexEdit::writeNibble(uint8_t value) {
     if (cursorPosition.nibble == 0) {
-        data->at(cursorPosition.byte) = (data->at(cursorPosition.byte)&0x0F) | (value<<4);
+        data.get()->storeCPU(cursorPosition.byte, (data.get()->fetchCPU(cursorPosition.byte)&0x0F) | (value<<4));
     }
     else {
-        data->at(cursorPosition.byte) = (data->at(cursorPosition.byte)&0xF0) | value;
+        data.get()->storeCPU(cursorPosition.byte, (data.get()->fetchCPU(cursorPosition.byte)&0xF0) | value);
     }
 }
 
@@ -143,7 +143,7 @@ void HexEdit::cursorRight() {
         cursorPosition.nibble = 1;
     }
     else {
-        if (cursorPosition.byte < (int)data->size()-1) {
+        if (cursorPosition.byte < 64*KB-1) {
             cursorPosition.byte++;
             cursorPosition.nibble = 0;
         }
@@ -169,7 +169,7 @@ void HexEdit::cursorUp() {
 }
 
 void HexEdit::cursorDown() {
-    if (cursorPosition.line() < (int)((float)data->size()/BYTES_PER_LINE-0.5)) {
+    if (cursorPosition.line() < (int)((float)64*KB/BYTES_PER_LINE-0.5)) {
         cursorPosition.byte += BYTES_PER_LINE;
     }
 }
@@ -201,7 +201,7 @@ void HexEdit::drawAddresses(QPainter *painter) {
 
     QString addresses = QString();
     for (unsigned int addr=verticalScrollBar()->value()*BYTES_PER_LINE ; addr<(verticalScrollBar()->value()+linesShown)*BYTES_PER_LINE ; addr+=BYTES_PER_LINE) {
-        if (addr >= data->size()) { break; }
+        if (addr >= 64*KB) { break; }
         addresses.append(hexAddress(addr)+"\n");
     }
 
@@ -250,8 +250,6 @@ void HexEdit::drawASCII(QPainter *painter) {
     QString ascii = QString();
     for (unsigned int line=0, addr=BYTES_PER_LINE*verticalScrollBar()->value() ; line<linesShown ; line++) {
         for (unsigned int o=0 ; o<BYTES_PER_LINE ; o++, addr++) {
-            if (addr >= data->size()) { goto endloop; }
-            if (data->at(addr)>=32 && data->at(addr)<=126) { ascii.append(data->at(addr)); }
             else { ascii.append("."); }
         }
         ascii.append("\n");
@@ -453,7 +451,6 @@ void HexEdit::keyPressEvent(QKeyEvent *event) {
         if (cursorPosition.area == AREA::ASCII) {
             if (!(event->text().isEmpty())) {
                 char d = event->text().toStdString().c_str()[0];
-                data->at(cursorPosition.byte) = d;
                 cursorRight();
                 cursorRight();
             }

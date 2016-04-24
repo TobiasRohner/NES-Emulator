@@ -48,6 +48,7 @@ public:
     CPU_6502(std::shared_ptr<Mapper> mapper, std::shared_ptr<COMMUNCATION_BRIDGE> bridge);
     ~CPU_6502();
 
+    void initialize();
     void processOpcode();
     void next();
     void SetIRQ();
@@ -62,6 +63,8 @@ public:
     uint8_t getA();
     uint8_t getX();
     uint8_t getY();
+
+    std::shared_ptr<COMMUNCATION_BRIDGE> getBridge();
 
 private:
     std::shared_ptr<COMMUNCATION_BRIDGE> bridge;
