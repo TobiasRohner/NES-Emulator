@@ -39,6 +39,7 @@
     <property name="title">
      <string>Run</string>
     </property>
+    <addaction name="actionStartup"/>
     <addaction name="actionExecute"/>
    </widget>
    <addaction name="menuDatei"/>
@@ -67,6 +68,11 @@
   <action name="actionExecute">
    <property name="text">
     <string>Execute</string>
+   </property>
+  </action>
+  <action name="actionStartup">
+   <property name="text">
+    <string>Startup</string>
    </property>
   </action>
  </widget>

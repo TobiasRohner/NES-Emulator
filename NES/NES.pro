@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     Emulator/debugger.cpp \
     Emulator/clock.cpp \
     Emulator/Memory/Mappers/mapper_0.cpp \
-    HexEditor/hexedit.cpp
+    HexEditor/hexedit.cpp \
+    Emulator/ppu_rp2c07.cpp
 
 HEADERS  += mainwindow.h \
     Emulator/Memory/memory.h \
@@ -34,7 +35,8 @@ HEADERS  += mainwindow.h \
     Emulator/cpu_6502.h \
     Emulator/debugger.h \
     Emulator/clock.h \
-    HexEditor/hexedit.h
+    HexEditor/hexedit.h \
+    Emulator/ppu_rp2c07.h
 
 FORMS    += mainwindow.ui \
     HexEditor/hexedit.ui \

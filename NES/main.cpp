@@ -1,17 +1,9 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <fstream>
-#include <stdint.h>
-#include "../HexEditor/hexedit.h"
-#include "Emulator/gamecartridge.h"
-#include "Emulator/debugger.h"
-#include "Emulator/cpu_6502.h"
-#include "Emulator/clock.h"
-#include "Emulator/Memory/Mappers/mapper.h"
-#include <thread>
-#include <functional>
+#include "mainwindow.h"
 
 
+/*
 std::vector<uint8_t> openBytes(const char* path) {
     std::ifstream file(path, std::ios::binary);
 
@@ -26,12 +18,12 @@ void runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk) {
         cpu.get()->next();
     }
 }
-
+*/
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
+/*
     GameCartridge cart = LoadROM("E:/Programmieren/C++/NES_v2/test2.nes");
     std::shared_ptr<Mapper> mapper(new Mapper(cart));
     std::shared_ptr<COMMUNCATION_BRIDGE> bridge(new COMMUNCATION_BRIDGE);
@@ -52,4 +44,9 @@ int main(int argc, char *argv[])
     threadCPU.join();
 
     return returnValue;
+*/
+    MainWindow w(0);
+    w.show();
+
+    return a.exec();
 }

@@ -11,27 +11,40 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    connectActions();
+    connectActions();
 
-//    bridge(new COMMUNCATION_BRIDGE);
+    bridge = std::shared_ptr<COMMUNCATION_BRIDGE>(new COMMUNCATION_BRIDGE);
+    cpu = std::shared_ptr<CPU_6502>(new CPU_6502(mapper, bridge));
 }
 
 MainWindow::~MainWindow()
 {
+    stopCPU();
     delete ui;
 }
-/*
-void MainWindow::loadCartridge(std::string path) {
+
+void MainWindow::loadCartridge(std::string path)
+{
     cartridge = LoadROM(path);
-    mapper(new Mapper(cartridge));
-    cpu(new CPU_6502(mapper, bridge));
+    mapper = std::shared_ptr<Mapper>(new Mapper(cartridge));
+    cpu = std::shared_ptr<CPU_6502>(new CPU_6502(mapper, bridge));
 }
 
-void MainWindow::connectActions() {
+bool MainWindow::getCPURunning()
+{
+    return cpuRunning;
+}
+
+void MainWindow::connectActions()
+{
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
+    connect(ui->actionOpenDebugger, &QAction::triggered, this, &MainWindow::openDebugger);
+    connect(ui->actionStartup, &QAction::triggered, this, &MainWindow::startup);
+    connect(ui->actionExecute, &QAction::triggered, this, &MainWindow::execute);
 }
 
-void MainWindow::runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk) {
+void MainWindow::runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk)
+{
     cpu.get()->initialize();
     for (;;) {
         if (brk) { break; }
@@ -39,16 +52,33 @@ void MainWindow::runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk) {
     }
 }
 
-void MainWindow::open() {
+void MainWindow::stopCPU()
+{
+    breakExecution = true;
+    terminateOpcode(bridge);
+    threadCPU.join();
+    breakExecution = false;
+}
+
+void MainWindow::open()
+{
     QString file = QFileDialog::getOpenFileName(this, "Open a ROM", QDir::currentPath(), "*.nes");
     loadCartridge(file.toStdString());
 }
 
-void MainWindow::execute() {
-    threadCPU(MainWindow::runCPU, cpu, std::reference_wrapper<bool>(breakExecution));
+void MainWindow::startup()
+{
+    threadCPU = std::thread(runCPU, this, cpu, std::reference_wrapper<bool>(breakExecution));
 }
 
-void MainWindow::openDebugger() {
-
+void MainWindow::execute()
+{
+    //TODO
 }
-*/
+
+void MainWindow::openDebugger()
+{
+    debugger.setData(mapper, cpu);
+    debugger.show();
+}
+

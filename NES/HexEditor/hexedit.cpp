@@ -228,13 +228,10 @@ void HexEdit::drawBytes(QPainter *painter) {
 
     QString bytes = QString();
     for (unsigned int line=0, addr=BYTES_PER_LINE*verticalScrollBar()->value() ; line<linesShown ; line++) {
-        for (unsigned int o=0 ; o<BYTES_PER_LINE-1 ; o++, addr++) {
-            if (addr >= data->size()) { goto endloop; }
-            bytes.append(hex(data->at(addr))+" ");
+        for (unsigned int o=0 ; o<BYTES_PER_LINE ; o++, addr++) {
+            if (addr >= 64*KB) { goto endloop; }
+            bytes.append(hex(data.get()->fetchCPU(addr))+" ");
         }
-        addr++;
-        if (addr >= data->size()) { goto endloop; }
-        bytes.append(hex(data->at(addr))+" ");
         bytes.append("\n");
     }
 endloop:
@@ -250,6 +247,8 @@ void HexEdit::drawASCII(QPainter *painter) {
     QString ascii = QString();
     for (unsigned int line=0, addr=BYTES_PER_LINE*verticalScrollBar()->value() ; line<linesShown ; line++) {
         for (unsigned int o=0 ; o<BYTES_PER_LINE ; o++, addr++) {
+            if (addr >= 64*KB) { goto endloop; }
+            if (data.get()->fetchCPU(addr)>=32 && data.get()->fetchCPU(addr)<=126) { ascii.append(data.get()->fetchCPU(addr)); }
             else { ascii.append("."); }
         }
         ascii.append("\n");
@@ -451,6 +450,7 @@ void HexEdit::keyPressEvent(QKeyEvent *event) {
         if (cursorPosition.area == AREA::ASCII) {
             if (!(event->text().isEmpty())) {
                 char d = event->text().toStdString().c_str()[0];
+                data.get()->storeCPU(cursorPosition.byte, d);
                 cursorRight();
                 cursorRight();
             }

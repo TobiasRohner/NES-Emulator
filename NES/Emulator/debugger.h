@@ -18,8 +18,11 @@ class Debugger : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu, QWidget *parent = 0);
+    Debugger(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu, QWidget *parent = 0);
+    Debugger(QWidget *parent = 0);
     ~Debugger();
+
+    void setData(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu);
 
     void updateAllRegisterDisplays();
 
