@@ -9,6 +9,7 @@
 #include "Emulator/debugger.h"
 #include "Emulator/clock.h"
 #include <thread>
+#include "options.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,30 +33,38 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    Debugger debugger = {};
+    std::shared_ptr<Debugger> debugger = std::shared_ptr<Debugger>(new Debugger);
 
     GameCartridge cartridge;
     std::shared_ptr<Mapper> mapper;
     std::shared_ptr<CPU_6502> cpu;
-    std::shared_ptr<COMMUNCATION_BRIDGE> bridge;
+    std::shared_ptr<COMMUNCATION_BRIDGE> bridgeCPU;
+    std::shared_ptr<COMMUNCATION_BRIDGE> bridgePPU;
 
     std::thread threadCPU;
+    std::thread threadClock;
 
-    bool breakExecution = false;
+    bool stopCPUExecution = false;
+    bool stopClockExecution = false;
 
     bool cpuRunning = false;
+    bool clockRunning = false;
 
     void connectActions();
 
-    void runCPU(std::shared_ptr<CPU_6502> cpu, bool &brk);
+    void startupCPU();
+    void runCPU(std::shared_ptr<CPU_6502> cpu, std::shared_ptr<Debugger> debugger, bool &brk);
     void stopCPU();
+    void startupClock();
+    void runClock(std::shared_ptr<COMMUNCATION_BRIDGE> bridgeCPU, std::shared_ptr<COMMUNCATION_BRIDGE> bridgePPU, bool &brk);
+    void stopClock();
 
 private slots:
 /*---------------File----------------*/
     void open();
 /*---------------Run-----------------*/
-    void startup();
     void execute();
+    void stopExecution();
 /*---------------Debug---------------*/
     void openDebugger();
 };

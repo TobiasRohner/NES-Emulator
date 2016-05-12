@@ -49,6 +49,7 @@ public:
     ~CPU_6502();
 
     void initialize();
+    void shutdown();
     void processOpcode();
     void next();
     void SetIRQ();
@@ -81,6 +82,8 @@ private:
     bool IRQ_set = false;
     bool NMI_set = false;
     bool RESET_set = false;
+
+    bool initialized = false;
 
     void processInterrupts();
 

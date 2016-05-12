@@ -25,6 +25,8 @@ public:
     void setData(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502> cpu);
 
     void updateAllRegisterDisplays();
+    void updateHexEditCPU();
+    void updateHexEditPPU();
 
 private:
     Ui::Debugger *ui;

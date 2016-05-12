@@ -19,10 +19,19 @@ CPU_6502::~CPU_6502()
 {
 }
 
-void CPU_6502::initialize() {
-    uint16_t lowByte = read8(0xFFFC);
-    uint16_t highByte = read8(0xFFFD);
-    PC = (highByte << 8) | lowByte;
+void CPU_6502::initialize()
+{
+    if (!initialized) {
+        uint16_t lowByte = read8(0xFFFC);
+        uint16_t highByte = read8(0xFFFD);
+        PC = (highByte << 8) | lowByte;
+        initialized = true;
+    }
+}
+
+void CPU_6502::shutdown()
+{
+    initialized = false;
 }
 
 void CPU_6502::processOpcode()

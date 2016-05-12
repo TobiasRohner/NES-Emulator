@@ -56,6 +56,25 @@ void Debugger::setData(std::shared_ptr<Mapper> mapper, std::shared_ptr<CPU_6502>
     hexeditPPU.updateMonitor();
 }
 
+void Debugger::updateAllRegisterDisplays()
+{
+    updateDisplayPC();
+    updateDisplaySP();
+    updateDisplayA();
+    updateDisplayX();
+    updateDisplayY();
+}
+
+void Debugger::updateHexEditCPU()
+{
+    hexeditCPU.updateMonitor();
+}
+
+void Debugger::updateHexEditPPU()
+{
+    hexeditPPU.updateMonitor();
+}
+
 void Debugger::setupUI()
 {
     ui->displayPC->setPrefix("0x");
@@ -124,13 +143,4 @@ void Debugger::updateDisplayX()
 void Debugger::updateDisplayY()
 {
     ui->displayY->setValue(cpu->getY());
-}
-
-void Debugger::updateAllRegisterDisplays()
-{
-    updateDisplayPC();
-    updateDisplaySP();
-    updateDisplayA();
-    updateDisplayX();
-    updateDisplayY();
 }
